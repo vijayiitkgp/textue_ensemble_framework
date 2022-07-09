@@ -15,8 +15,8 @@ def parse_opts():
     parser.set_defaults(save_result=True)
 
     parser.add_argument('--top_n', default=10, type=int, help='Different name for each train')
-    parser.add_argument('--div_factor', default=25, type=int, help='Different name for each train')
-    parser.add_argument('--final_div_factor', default=10000, type=int, help='Different name for each train')
+    parser.add_argument('--div_factor', default=25, type=float, help='Different name for each train')
+    parser.add_argument('--final_div_factor', default=10000, type=float, help='Different name for each train')
     parser.add_argument('--pct_start', default=0.3, type=float, help='Different name for each train')
 
     parser.add_argument('--model', default='Resnet', type=str, help='Model used to train (Resnet | DeepTEN | DEP)')
@@ -81,6 +81,7 @@ def parse_opts():
     parser.add_argument('--optimizer', default='SGD', type=str, help='Currently only support SGD and Adam')
     parser.add_argument('--ft_portion', default='none', type=str, help='Portion of parameters for fine-tuning')
     parser.add_argument('--ft_lr', default=0.001, type=float, help='Learning rate of fine-tuning')
+    parser.add_argument('--cosine_min', default=0.001, type=float, help='minimum Learning rate of cosine scheduler')
 
     parser.add_argument('--scheduler', default='step', type=str, help='Scheduler: only support Step, Cosine and ReduceLROnPlateau')
     parser.add_argument('--lr_patience', default=10, type=int, help='Patience of LR scheduler. See documentation of ReduceLROnPlateau.')

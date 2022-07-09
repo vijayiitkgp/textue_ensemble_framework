@@ -101,7 +101,7 @@ def get_Scheduler(opt, optimizer):
     elif opt.scheduler == 'cosinewarmrestart':
         scheduler = lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=opt.T_max, T_mult=1, eta_min=10e-7)         # CosineAnnealingLR(optimizer, T_max=opt.T_max, eta_min=10e-7)   # CosineAnnealingWarmRestarts(optimizer, T_0=10, T_mult=1, eta_min=10e-7)
     elif opt.scheduler == 'cosine':
-        scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=opt.T_max, eta_min=10e-7)
+        scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=opt.T_max, eta_min=opt.cosine_min)
 
     elif opt.scheduler == 'cycliclr':
         scheduler = lr_scheduler.CyclicLR(optimizer, opt.lr, max_lr=opt.max_lr, step_size_up=opt.steps_per_epochs*5, step_size_down=opt.steps_down_epochs, mode=opt.annealing_mode, gamma=0.9998, scale_fn=None, scale_mode='cycle', cycle_momentum=True, base_momentum=0.8, max_momentum=0.9, last_epoch=- 1, verbose=False)

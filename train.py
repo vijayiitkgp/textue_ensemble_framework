@@ -82,10 +82,13 @@ def train_model(model, opt, dataloaders, criterion, optimizer, device, num_epoch
                         if opt.grad_clip: 
                             torch.nn.utils.clip_grad_value_(model.parameters(), opt.grad_clip)
                         optimizer.step()
-                        if scheduler.__class__.__name__ == 'ReduceLROnPlateau':
-                            scheduler.step(epoch_acc)
+                        if opt.scheduler=='cosine':
+                            pass
                         else:
-                            scheduler.step()
+                            if scheduler.__class__.__name__ == 'ReduceLROnPlateau':
+                                scheduler.step(epoch_acc)
+                            else:
+                                scheduler.step()
 
                 # statistics
                 # import pdb
