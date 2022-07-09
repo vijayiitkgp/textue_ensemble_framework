@@ -45,9 +45,12 @@ def train_model(model, opt, dataloaders, criterion, optimizer, device, num_epoch
             
             running_loss = 0.0
             running_corrects = 0
+            last_lr = 0.0
 
             # Iterate over data.
             for idx, (inputs, labels) in enumerate(Bar(dataloaders[phase])):
+                #if(last_lr==0.0):
+                 #   continue
                 inputs = inputs.to(device)
                 labels = labels.to(device)
                 #print(labels)
@@ -78,17 +81,22 @@ def train_model(model, opt, dataloaders, criterion, optimizer, device, num_epoch
                     #print(preds)
                     # backward + optimize only if in training phase
                     if phase == 'train':
+                        
                         cel_loss.backward()
                         if opt.grad_clip: 
                             torch.nn.utils.clip_grad_value_(model.parameters(), opt.grad_clip)
                         optimizer.step()
-                        if opt.scheduler=='cosine':
-                            pass
-                        else:
-                            if scheduler.__class__.__name__ == 'ReduceLROnPlateau':
-                                scheduler.step(epoch_acc)
+                        if  opt.optimizer=='SGD':
+    
+                            if opt.scheduler=='cosine':
+                                pass
                             else:
-                                scheduler.step()
+                                if scheduler.__class__.__name__ == 'ReduceLROnPlateau':
+                                    scheduler.step(epoch_acc)
+                                else:
+                                    scheduler.step()
+                        else:
+                            pass
 
                 # statistics
                 # import pdb
@@ -106,8 +114,10 @@ def train_model(model, opt, dataloaders, criterion, optimizer, device, num_epoch
         
             epoch_loss = running_loss / (len(dataloaders[phase].sampler))
             epoch_acc = running_corrects.double() / (len(dataloaders[phase].sampler))
-            #writer.add_scalar("Loss/train", epoch_loss, epoch)
-            #writer.add_scalar("Accuracy/train", epoch_acc, epoch)
+            last_lr = scheduler.get_last_lr()[0]
+            writer.add_scalar("Loss/train for "+opt.experiment_name, epoch_loss, epoch)
+            writer.add_scalar("Accuracy/train "+opt.experiment_name, epoch_acc, epoch)
+            writer.add_scalar("LR "+opt.experiment_name,torch.as_tensor(last_lr), epoch)
             # import pdb
             # pdb.set_trace()
             # mlflow.log_metric("epoch_{}_loss".format(phase),float(epoch_loss),step=epoch)
@@ -116,12 +126,15 @@ def train_model(model, opt, dataloaders, criterion, optimizer, device, num_epoch
                                  'epoch_{}_acc'.format(phase):float(epoch_acc)}, step=epoch)
         
             if phase == 'train':
-                if scheduler.__class__.__name__ == 'ReduceLROnPlateau':
-                    scheduler.step(epoch_acc)
+                if  opt.optimizer=='SGD':
+
+                    if scheduler.__class__.__name__ == 'ReduceLROnPlateau':
+                        scheduler.step(epoch_acc)
+                    else:
+                        scheduler.step()
+                        print("lr caluculated by scheduler is: "+str(scheduler.get_last_lr()))
                 else:
-                    scheduler.step()
-                    print("lr caluculated by scheduler is: "+str(scheduler.get_last_lr()))
-                    
+                        pass
                 train_error_history.append(epoch_loss)
                 train_acc_history.append(epoch_acc.cpu())
 

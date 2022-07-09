@@ -87,7 +87,7 @@ if __name__ == '__main__':
         mlflow.log_param("seed",opt.seed)
         mlflow.log_param("dim",opt.dim)
 
-        dataloaders_dict = Prepare_DataLoaders(opt, split+1, input_size=(224, 224))
+        dataloaders_dict = Prepare_DataLoaders(opt, split+1, input_size=(224, 224),device=device)
         model = initialize_model(opt).to(device)
         #print((model.parameters()).is_cuda)
         # for k,v in model.state_dict().items():

@@ -98,6 +98,7 @@ def parse_opts():
     parser.add_argument('--begin_epoch', default=0, type=int, help='Training begins at this epoch. Previous trained model indicated by resume_path is loaded.')
     parser.add_argument('--resume_path', default='', type=str, help='Save data (.pth) of previous training')
     parser.add_argument('--pretrain_path', default='', type=str, help='Pretrained model (.pth)')
+    parser.add_argument('--experiment_name', default='', type=str, help='Pretrained model (.pth)')
     
     parser.add_argument('--train_need', action='store_true', help='If true, training is performed.')
     parser.set_defaults(train_need=False)
@@ -115,6 +116,8 @@ def parse_opts():
     parser.add_argument('--checkpoint', default=10, type=int, help='Trained model is saved at every this epochs.')
     parser.add_argument('--chained', action='store_true', help='pin_memory')
     parser.set_defaults(chained=False)
+    parser.add_argument('--amsgrad', action='store_true', help='pin_memory')
+    parser.set_defaults(amsgrad=False)
 
     # args = parser.parse_args()
 

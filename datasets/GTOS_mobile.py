@@ -18,7 +18,7 @@ _imagenet_pca = {
 
 class GTOS_mobile_single_data(Dataset):
 
-    def __init__(self, texture_dir,split, kind = 'train', split_board=0.9, image_size = 384, img_transform = None):  # numset: 0~5 #paper:256
+    def __init__(self, texture_dir,split, kind = 'train', split_board=0.9, image_size = 384, img_transform = None, device='cuda:0'):  # numset: 0~5 #paper:256
         self.texture_dir = texture_dir
         self.img_transform = img_transform
         self.files = []  # empty list

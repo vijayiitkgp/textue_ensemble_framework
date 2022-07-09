@@ -46,7 +46,7 @@ class  add_random_noise(object):
 
 
 
-def Prepare_DataLoaders(opt, split, input_size=(224,224)):
+def Prepare_DataLoaders(opt, split, input_size=(224,224),device='cuda:0'):
     
     dataset = opt.dataset
     data_dir = Datasets_Info['data_dirs'][dataset]
@@ -108,10 +108,10 @@ def Prepare_DataLoaders(opt, split, input_size=(224,224)):
         
         train_dataset = GTOS_mobile_single_data(data_dir,split, kind = 'train',
                                            image_size=opt.resize_size,
-                                           img_transform=data_transforms['train'])
+                                           img_transform=data_transforms['train'], device=device)
 
         test_dataset = GTOS_mobile_single_data(data_dir,split, kind = 'test',
-                                           img_transform=data_transforms['test'])
+                                           img_transform=data_transforms['test'], device=device)
 
     image_datasets = {'train': train_dataset, 'test': test_dataset}
 
@@ -120,6 +120,7 @@ def Prepare_DataLoaders(opt, split, input_size=(224,224)):
                                                        batch_size=eval('opt.{}_BS'.format(x)), 
                                                        shuffle=False if x=='test' else True,
                                                        num_workers=opt.num_workers,
+                                                       #prefetch_factor=6, persistent_workers=True,
                                                        pin_memory=opt.pin_memory) for x in ['train', 'test']}
     
     return dataloaders_dict

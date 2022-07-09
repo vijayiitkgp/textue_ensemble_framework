@@ -88,6 +88,11 @@ def get_Optimizer(opt, model):
         optimizer = optim.SGD(get_parameters(opt, model), lr=opt.lr, momentum=opt.momentum, nesterov=False, weight_decay=opt.weight_decay)
     elif opt.optimizer == 'Adam':
         optimizer = optim.Adam(model.parameters(), lr=opt.lr, betas=(opt.beta1, opt.beta2), eps=opt.eps, weight_decay=opt.weight_decay)
+    elif opt.optimizer == 'Adamw':
+        optimizer = optim.AdamW(model.parameters(), lr=opt.lr, betas=(0.9, 0.999), eps=1e-08, weight_decay=opt.weight_decay, amsgrad=opt.amsgrad)
+        
+        #optimizer = optim.Adam(model.parameters(), lr=opt.lr, betas=(opt.beta1, opt.beta2), eps=opt.eps, weight_decay=opt.weight_decay)
+
     else:
         raise Exception('Unexpected Optimizer of {}'.format(opt.optimizer))
     return optimizer
