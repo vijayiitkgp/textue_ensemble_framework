@@ -102,15 +102,20 @@ def get_Scheduler(opt, optimizer):
         scheduler = lr_scheduler.StepLR(optimizer, step_size=opt.lr_step, gamma=opt.gamma)
     
     elif opt.scheduler == 'onecyclelr':
-        scheduler = lr_scheduler.OneCycleLR(optimizer, max_lr=opt.max_lr, total_steps=None, epochs=opt.ramp_epochs, steps_per_epoch=opt.steps_per_epochs, pct_start=opt.pct_start, anneal_strategy='cos', cycle_momentum=True, base_momentum=0.85, max_momentum=0.95, div_factor=opt.div_factor, final_div_factor=opt.final_div_factor, last_epoch=- 1, verbose=False)
+        scheduler1 = lr_scheduler.OneCycleLR(optimizer, max_lr=opt.max_lr, total_steps=None, epochs=opt.ramp_epochs, steps_per_epoch=opt.steps_per_epochs, pct_start=opt.pct_start, anneal_strategy='cos', cycle_momentum=True, base_momentum=0.85, max_momentum=0.95, div_factor=opt.div_factor, final_div_factor=opt.final_div_factor, last_epoch=- 1, verbose=False)
+        scheduler2 = lr_scheduler.StepLR(optimizer, step_size=1, gamma=1)
+
     elif opt.scheduler == 'cosinewarmrestart':
-        scheduler = lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=opt.T_max, T_mult=1, eta_min=10e-7)         # CosineAnnealingLR(optimizer, T_max=opt.T_max, eta_min=10e-7)   # CosineAnnealingWarmRestarts(optimizer, T_0=10, T_mult=1, eta_min=10e-7)
+        scheduler1 = lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=opt.T_max, T_mult=opt.T_mult, eta_min=opt.cosine_min) 
+        scheduler2 = lr_scheduler.StepLR(optimizer, step_size=1, gamma=1)   # LinearLR(optimizer, start_factor=0.3333333333333333, end_factor=0.8, total_iters=opt.T_max)
+        # CosineAnnealingLR(optimizer, T_max=opt.T_max, eta_min=10e-7)   # CosineAnnealingWarmRestarts(optimizer, T_0=10, T_mult=1, eta_min=10e-7)
     elif opt.scheduler == 'cosine':
-        scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=opt.T_max, eta_min=opt.cosine_min)
+        scheduler1 = lr_scheduler.CosineAnnealingLR(optimizer, T_max=opt.T_max, eta_min=opt.cosine_min)
+        scheduler2 = lr_scheduler.StepLR(optimizer, step_size=1, gamma=1)
 
     elif opt.scheduler == 'cycliclr':
-        scheduler = lr_scheduler.CyclicLR(optimizer, opt.lr, max_lr=opt.max_lr, step_size_up=opt.steps_per_epochs*5, step_size_down=opt.steps_down_epochs, mode=opt.annealing_mode, gamma=0.9998, scale_fn=None, scale_mode='cycle', cycle_momentum=True, base_momentum=0.8, max_momentum=0.9, last_epoch=- 1, verbose=False)
-
+        scheduler1 = lr_scheduler.CyclicLR(optimizer, opt.lr, max_lr=opt.max_lr, step_size_up=opt.steps_per_epochs*5, step_size_down=opt.steps_down_epochs, mode=opt.annealing_mode, gamma=0.9998, scale_fn=None, scale_mode='cycle', cycle_momentum=True, base_momentum=0.8, max_momentum=0.9, last_epoch=- 1, verbose=False)
+        scheduler2 = lr_scheduler.StepLR(optimizer, step_size=1, gamma=1)
 
     elif opt.scheduler == 'OnPlateau':
         scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=10, verbose=False, threshold=0.0001, threshold_mode='rel', cooldown=0, min_lr=0, eps=1e-08)
@@ -122,7 +127,7 @@ def get_Scheduler(opt, optimizer):
 
     else:
         raise Exception('Unexpected Scheduler of {}'.format(opt.scheduler))
-    return scheduler
+    return [scheduler1, scheduler2]
 
 def save_results(train_dict,test_dict,split,opt):
 

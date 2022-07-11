@@ -15,7 +15,7 @@ import torch
 from torch.utils.tensorboard import SummaryWriter
 writer = SummaryWriter()
 stream = io.BytesIO()
-def train_model(model, opt, dataloaders, criterion, optimizer, device, num_epochs=30, epoch_start=0, scheduler=None):
+def train_model(model, opt, dataloaders, criterion, optimizer, device, num_epochs=30, epoch_start=0, scheduler=[]):
      
     since = time.time()
     best_acc = 0.0
@@ -30,9 +30,12 @@ def train_model(model, opt, dataloaders, criterion, optimizer, device, num_epoch
 
         torch.distributed.init_process_group( backend='nccl', world_size=8, init_method='env://vija',rank=0)
         model = DistributedDataParallel(model, device_ids=[0,1,2,3,4,5,6,7], output_device=0)
-    else:
+    elif opt.data_parallel:
         model = torch.nn.DataParallel(model, device_ids = [0,1,2,3,4,5,6,7])
         model.to(device)
+    else:
+        pass
+
     for epoch in range(epoch_start, num_epochs):
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
         print('-' * 10)
@@ -88,13 +91,13 @@ def train_model(model, opt, dataloaders, criterion, optimizer, device, num_epoch
                         optimizer.step()
                         if  opt.optimizer=='SGD':
     
-                            if opt.scheduler=='cosine':
+                            if opt.scheduler=='cosine' or opt.scheduler=='cosinewarmrestart':
                                 pass
                             else:
-                                if scheduler.__class__.__name__ == 'ReduceLROnPlateau':
-                                    scheduler.step(epoch_acc)
+                                if scheduler[0].__class__.__name__ == 'ReduceLROnPlateau':
+                                    scheduler[0].step(epoch_acc)
                                 else:
-                                    scheduler.step()
+                                    scheduler[0].step()
                         else:
                             pass
 
@@ -111,12 +114,21 @@ def train_model(model, opt, dataloaders, criterion, optimizer, device, num_epoch
                 running_loss += cel_loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels.data)
                 #print(running_corrects)
-        
+            train_epoch_acc=0.0
+            test_epoch_acc=0.0
+            
             epoch_loss = running_loss / (len(dataloaders[phase].sampler))
             epoch_acc = running_corrects.double() / (len(dataloaders[phase].sampler))
-            last_lr = scheduler.get_last_lr()[0]
-            writer.add_scalar("Loss/train for "+opt.experiment_name, epoch_loss, epoch)
-            writer.add_scalar("Accuracy/train "+opt.experiment_name, epoch_acc, epoch)
+            last_lr = scheduler[0].get_last_lr()[0]
+            if phase == 'train':
+                train_epoch_acc = epoch_acc
+            else:
+                test_epoch_acc = epoch_acc
+            #writer.add_scalar("Loss/train for "+opt.experiment_name, epoch_loss, epoch)
+            #writer.add_scalar("Accuracy/train "+opt.experiment_name, epoch_acc, epoch)
+            
+            writer.add_scalars("Accuracy/train/test "+opt.experiment_name, {'train acc':train_epoch_acc,
+                                                    'test_acc':test_epoch_acc}, epoch)
             writer.add_scalar("LR "+opt.experiment_name,torch.as_tensor(last_lr), epoch)
             # import pdb
             # pdb.set_trace()
@@ -128,11 +140,12 @@ def train_model(model, opt, dataloaders, criterion, optimizer, device, num_epoch
             if phase == 'train':
                 if  opt.optimizer=='SGD':
 
-                    if scheduler.__class__.__name__ == 'ReduceLROnPlateau':
-                        scheduler.step(epoch_acc)
+                    if scheduler[0].__class__.__name__ == 'ReduceLROnPlateau':
+                        scheduler[0].step(epoch_acc)
                     else:
-                        scheduler.step()
-                        print("lr caluculated by scheduler is: "+str(scheduler.get_last_lr()))
+                        scheduler[0].step()
+                        scheduler[1].step()
+                        print("lr caluculated by scheduler is: "+str(scheduler[0].get_last_lr()))
                 else:
                         pass
                 train_error_history.append(epoch_loss)

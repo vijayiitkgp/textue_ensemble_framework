@@ -46,8 +46,11 @@ def parse_opts():
     parser.add_argument('--eps', default=1e-8, type=float, help='eps of Adam')
     parser.add_argument('--weight_decay', default=5e-4, type=float, help='Weight Decay of Optimizer')
     parser.add_argument('--T_max', default=10, type=int, help='max epoch for the cosine scheduler')
+    parser.add_argument('--T_mult', default=2, type=int, help='max epoch for the cosine scheduler')
+
     parser.add_argument('--ramp_epochs', default=10, type=int, help='max epoch for the cosine scheduler')
     parser.add_argument('--steps_per_epochs', default=100, type=int, help='max epoch for the cosine scheduler')
+
     parser.add_argument('--steps_down_epochs', default=100, type=int, help='max epoch for the cosine scheduler')
     #steps_down_epochs
 
@@ -69,7 +72,10 @@ def parse_opts():
     parser.add_argument('--grad_clip', action='store_true', help='Whether the input image need to be five cropped or not')
     parser.set_defaults(grad_clip=False)
     parser.add_argument('--distributed', action='store_true', help='Whether the input image need to be five cropped or not')
-    parser.set_defaults(grad_clip=False)
+    parser.set_defaults(distributed=False)
+    parser.add_argument('--data_parallel', action='store_true', help='Whether the input image need to be five cropped or not')
+    parser.set_defaults(data_parallel=False)
+
 
     # parser.add_argument('--no_mean_norm', action='store_true', help='If true, inputs are not normalized by mean.')
     # parser.set_defaults(no_mean_norm=False)

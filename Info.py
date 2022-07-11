@@ -1,7 +1,7 @@
 data_dirs = {'DTD': '../data/dtd/',
              'MINC_2500': '../data/minc-2500/',
              'GTOS-mobile': '../data/gtos-mobile/',
-             'FMD': './data/FMD/',
+             'FMD': '../data/FMD/',
              'KTH': '../data/KTH-TIPS2-b/',
              'GTOS': './data/gtos/'}
 
