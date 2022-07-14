@@ -251,20 +251,12 @@ class Net(nn.Module):
             #nn.ELU(),
             #nn.Dropout(0.20),
             #nn.AlphaDropout(p=0.1),
-            nn.Linear(736, 128),
+            nn.Linear(688, 128),
             encoding.nn.Normalize(),
             #nn.ELU(),
             #nn.Dropout(0.50),
             nn.Linear(128, nclass)  # nclass
         )
-
-        self.pool = nn.Sequential(
-            nn.AvgPool2d(7),
-            encoding.nn.View(-1, 512),
-            nn.Linear(512, self.dim*3),
-            nn.BatchNorm1d(self.dim*3),
-        )
-
 
         self.UP = nn.ConvTranspose2d(512, 512, 3, 2, groups=512)  # group operation is important for compact model size
         self.conv_down = nn.Sequential(
@@ -314,10 +306,9 @@ class Net(nn.Module):
         x2 = torch.cat((fracdim0, fracdim1, fracdim2), 1)
         x_temp = self.conv_down(x)
         x_hist = torch.flatten(self.histogram_layer(x_temp), start_dim=1)
-        x1 = self.pool(x)
-
+        
         #x = torch.cat((x1, x2, x_hist), 1)
-        x = torch.cat((x0,x1, x2, x_hist), 1)
+        x = torch.cat((x0,x2, x_hist), 1)
         #x = self.noise(x)
         #print("x shape is:", x.shape)
 

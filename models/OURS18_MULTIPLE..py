@@ -208,6 +208,8 @@ class Net(nn.Module):
         super(Net, self).__init__()
         nclass = opt.n_classes
         # copying modules from pretrained models
+        self.opt = opt
+
         if opt.backbone.lower() == 'resnet18':
             self.backbone = models.resnet18(pretrained=opt.use_pretrained)
         elif opt.backbone.lower() == 'resnet50':
@@ -245,13 +247,13 @@ class Net(nn.Module):
             nn.BatchNorm2d(3),
             nn.ReLU())
         self.mfs = FAP(opt, D=1, K=self.dim)
-
+        self.fc_no = opt.fc_no
         self.fc = nn.Sequential(
             encoding.nn.Normalize(),
             #nn.ELU(),
             #nn.Dropout(0.20),
             #nn.AlphaDropout(p=0.1),
-            nn.Linear(736, 128),
+            nn.Linear(self.fc_no, 128),
             encoding.nn.Normalize(),
             #nn.ELU(),
             #nn.Dropout(0.50),
@@ -261,10 +263,10 @@ class Net(nn.Module):
         self.pool = nn.Sequential(
             nn.AvgPool2d(7),
             encoding.nn.View(-1, 512),
-            nn.Linear(512, self.dim*3),
-            nn.BatchNorm1d(self.dim*3),
-        )
-
+            nn.Linear(512, self.dim * 3),
+            nn.BatchNorm1d(self.dim * 3),
+            )
+                                                            
 
         self.UP = nn.ConvTranspose2d(512, 512, 3, 2, groups=512)  # group operation is important for compact model size
         self.conv_down = nn.Sequential(
@@ -311,13 +313,28 @@ class Net(nn.Module):
         fracdim1 = self.mfs(c1).squeeze_(-1).squeeze_(-1)
         fracdim2 = self.mfs(c2).squeeze_(-1).squeeze_(-1)
         x0 = self.head(x)
+        x1 = self.pool(x)
         x2 = torch.cat((fracdim0, fracdim1, fracdim2), 1)
         x_temp = self.conv_down(x)
         x_hist = torch.flatten(self.histogram_layer(x_temp), start_dim=1)
-        x1 = self.pool(x)
-
+        
+        if self.opt.technique == "GAP":
+            x=x1
+            self.fc_no=48
+        elif self.opt.technique == "DEEPTEN":
+            x=x0
+            self.fc_no=128
+        elif self.opt.technique == "HISTOGRAM":
+            x=x_hist
+            self.fc_no=512
+        elif self.opt.technique == "FENET":
+            x=x2
+            self.fc_no=48
+        else:
+            print("invalid technique")
+            raise RuntimeError('unknown technique type')
         #x = torch.cat((x1, x2, x_hist), 1)
-        x = torch.cat((x0,x1, x2, x_hist), 1)
+        #x = torch.cat((x0,x2, x_hist), 1)
         #x = self.noise(x)
         #print("x shape is:", x.shape)
 

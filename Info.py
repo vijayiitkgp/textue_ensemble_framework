@@ -3,7 +3,7 @@ data_dirs = {'DTD': '../data/dtd/',
              'GTOS-mobile': '../data/gtos-mobile/',
              'FMD': '../data/FMD/',
              'KTH': '../data/KTH-TIPS2-b/',
-             'GTOS': './data/gtos/'}
+             'GTOS': '../data/gtos/'}
 
 #Number of classes in each dataset
 num_classes = {'DTD': 47,

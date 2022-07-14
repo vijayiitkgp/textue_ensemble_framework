@@ -40,6 +40,9 @@ def train_model(model, opt, dataloaders, criterion, optimizer, device, num_epoch
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
         print('-' * 10)
         # Each epoch has a training and testidation phase
+        train_epoch_acc=0.0
+        test_epoch_acc=0.0
+
         for phase in ['train', 'test']:
             if phase == 'train':
                 model.train()  # Set model to training mode 
@@ -114,8 +117,8 @@ def train_model(model, opt, dataloaders, criterion, optimizer, device, num_epoch
                 running_loss += cel_loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels.data)
                 #print(running_corrects)
-            train_epoch_acc=0.0
-            test_epoch_acc=0.0
+            #train_epoch_acc=0.0
+            #test_epoch_acc=0.0
             
             epoch_loss = running_loss / (len(dataloaders[phase].sampler))
             epoch_acc = running_corrects.double() / (len(dataloaders[phase].sampler))
@@ -127,8 +130,8 @@ def train_model(model, opt, dataloaders, criterion, optimizer, device, num_epoch
             #writer.add_scalar("Loss/train for "+opt.experiment_name, epoch_loss, epoch)
             #writer.add_scalar("Accuracy/train "+opt.experiment_name, epoch_acc, epoch)
             
-            writer.add_scalars("Accuracy/train/test "+opt.experiment_name, {'train acc':train_epoch_acc,
-                                                    'test_acc':test_epoch_acc}, epoch)
+            # writer.add_scalars("Accuracy/train/test "+opt.experiment_name, {'train acc':train_epoch_acc,
+                                                    #'test_acc':test_epoch_acc}, epoch)
             writer.add_scalar("LR "+opt.experiment_name,torch.as_tensor(last_lr), epoch)
             # import pdb
             # pdb.set_trace()
@@ -162,6 +165,8 @@ def train_model(model, opt, dataloaders, criterion, optimizer, device, num_epoch
             print()
             print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))               
             print("till best test accuracy and epoch  is: "+str(best_acc)+", "+str(best_epoch))
+        
+        writer.add_scalars("Accuracy/train/test "+opt.experiment_name,{'train acc':train_epoch_acc,'test_acc':test_epoch_acc}, epoch)
 
     time_elapsed = time.time() - since
     print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))

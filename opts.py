@@ -95,6 +95,9 @@ def parse_opts():
     parser.add_argument('--val_BS', default=16, type=int, help='Batch Size for validating')
     parser.add_argument('--test_BS', default=16, type=int, help='Batch Size for testing')
     parser.add_argument('--seed', default=10, type=int, help='Random seed')
+    parser.add_argument('--fc_no', default=688, type=int, help='Random seed')
+    parser.add_argument('--technique', default="NONE", type=str, help='Random seed')
+
 
     parser.add_argument('--num_epochs', default=30, type=int, help='Number of total epochs to run')
     parser.add_argument('--start_run', default=0, type=int, help='Number of total epochs to run')
