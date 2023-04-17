@@ -50,17 +50,33 @@ To run the code, Install the dependencies first using the following commands
 
 
 ## Code Run
-
-Run the code using following command on colab or terminal
-
+- Clone the repository.
+- Create a data folder outside the project folder and put the downloaded data in that folder.
+- Run the code using following command on colab or terminal for different datasets.
 
 For FMD dataset
 ```bash
-  python main.py --dataset=FMD  --n_classes=10 --train_need --test_need  --test_BS=16 --train_BS=16  --model=FENet --use_pretrained --num_epochs=60 --scheduler="cosine" --lr=0.001
+  python main.py --dataset=FMD --train_need --test_need  --test_BS=16 --train_BS=16  --model=ENSEMBLE --use_pretrained --num_epochs=30 --scheduler="cosine" --lr=0.001
 ```
  For KTH dataset
 ```bash
-  python main.py --dataset=KTH --n_classes=11 --train_need --test_need  --test_BS=32 --train_BS=32  --model=FENet --use_pretrained --num_epochs=40 --scheduler="cosine" --lr=0.01
+  python main.py --dataset=KTH --train_need --test_need  --test_BS=32 --train_BS=32  --model=ENSEMBLE --use_pretrained --num_epochs=30 --scheduler="cosine" --lr=0.01
+```  
+For MINC_2500 dataset
+```bash
+  python main.py --dataset=MINC_2500 --train_need --test_need  --test_BS=16 --train_BS=16  --model=ENSEMBLE --use_pretrained --num_epochs=20 --scheduler="cosine" --lr=0.001
+```
+For DTD dataset
+```bash
+  python main.py --dataset=DTD --train_need --test_need  --test_BS=16 --train_BS=16  --model=ENSEMBLE --use_pretrained --num_epochs=30 --scheduler="cosine" --lr=0.001
+```
+For GTOS dataset
+```bash
+  python main.py --dataset=GTOS --train_need --test_need  --test_BS=16 --train_BS=16  --model=ENSEMBLE --use_pretrained --num_epochs=20 --scheduler="cosine" --lr=0.001
+```
+For GTOS-MOBILE dataset
+```bash
+  python main.py --dataset=GTOS-mobile --train_need --test_need  --test_BS=16 --train_BS=16  --model=ENSEM
 ```   
 ## Usage
 
