@@ -78,13 +78,13 @@ Our Architecture
 
 ![Arch](https://github.com/faisu07/Texture_Analysis/blob/main/Our%20ARCHITECTURE_latest.jpeg)  
 
-## Results
+<!-- ## Results
 
 ![Results of triple combination](https://github.com/faisu07/Texture_Analysis/blob/main/results3.png)    
 
 ![Results of single combination](https://github.com/faisu07/Texture_Analysis/blob/main/resukts2.png)    
 
-![Results of double combination](https://github.com/faisu07/Texture_Analysis/blob/main/results.png)
+![Results of double combination](https://github.com/faisu07/Texture_Analysis/blob/main/results.png) -->
 
 
 
